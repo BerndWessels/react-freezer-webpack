@@ -31,9 +31,18 @@ import {IntlProvider, FormattedMessage} from 'react-intl';
 /**
  * The component.
  */
-export default class extends React.Component {
+export default class Home extends React.Component {
+
     // Expected properties.
-    static propTypes = {};
+    static propTypes = {
+        children: React.PropTypes.node,
+        history: React.PropTypes.object,
+        location: React.PropTypes.object,
+        params: React.PropTypes.object,
+        route: React.PropTypes.object,
+        routeParams: React.PropTypes.object,
+        routes: React.PropTypes.array
+    };
 
     // Expected context properties.
     static contextTypes = {
@@ -74,10 +83,10 @@ export default class extends React.Component {
     // If shouldComponentUpdate returns false, then render() will be completely skipped until the next state change.
     // In addition, componentWillUpdate and componentDidUpdate will not be called.
     shouldComponentUpdate(nextProps, nextState) {
-        console.log(nextProps);
-        console.log(React.addons.shallowCompare(this, nextProps, nextState));
-        // This is a pure component.
-        return React.addons.shallowCompare(this, nextProps, nextState);
+        // This is not a pure component.
+        // Basically the whole store's state is a prop which means
+        // we always have to update the component when the store's state changes.
+        return true;
     }
 
     // Invoked immediately before rendering when new props or state are being received.
@@ -104,14 +113,15 @@ export default class extends React.Component {
     render() {
         // Get the application state.
         var state = this.context.store.get();
+        console.log(this.props);
         // Get the properties.
         // const {children} = this.props;
         // Calculate the styles.
         let className = style.root;
         // Return the component UI.
         return (
-            <div className={className} onClick={()=>{console.log(state.set({x: Math.random()}));}}>
-                <h1>{JSON.stringify(this.props)}</h1>
+            <div className={className} onClick={()=>{state.set({x: Math.random()});}}>
+                <h3>{JSON.stringify(this.props, 4)}</h3>
             </div>
         );
     }
