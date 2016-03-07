@@ -1,25 +1,32 @@
 {
-  "name": "react-redux-fullstack",
+  "name": "react-freezer-fullstack",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is an example on how to use react with freezer and webpack.",
   "main": "src/index.js",
   "scripts": {
     "build": "webpack --config webpack.build.js --bail -p",
+    "build:serve": "babel-node --eval \"var script = require('./scripts/buildServe'); script.default().catch(err => console.error(err.stack))\"",
     "postinstall": "babel-node --eval \"var script = require('./scripts/externalsUpdate'); script.default().catch(err => console.error(err.stack))\"",
     "start": "webpack-dev-server --history-api-fallback --inline --progress --hot --watch",
     "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js \"test/**/*.@(js|jsx)\"",
     "test:watch": "npm run test -- --watch",
     "translations:extract": "babel-node --eval \"var script = require('./scripts/translationsExtract'); script.default().catch(err => console.error(err.stack))\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "react",
+    "freezer",
+    "webpack"
+  ],
+  "author": "Bernd Wessels",
+  "license": "MIT",
   "dependencies": {
+    "classnames": "^2.0.0",
     "freezer-js": "^0.10.0",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
     "react-intl": ">=2.0.0-beta-2",
-    "react-router": "^2.0.0"
+    "react-router": "^2.0.0",
+    "whatwg-fetch": "^0.11.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.0",
@@ -38,10 +45,13 @@
     "clean-webpack-plugin": "^0.1.0",
     "copy-webpack-plugin": "^1.0.0",
     "css-loader": "^0.23.0",
+    "exports-loader": "^0.6.3",
+    "express": "^4.13.4",
     "extract-text-webpack-plugin": "^1.0.0",
     "file-loader": "^0.8.0",
     "html-loader": "^0.4.0",
     "html-webpack-plugin": "^2.0.0",
+    "imports-loader": "^0.6.5",
     "isparta-instrumenter-loader": "^1.0.0",
     "jsdom": "^8.0.0",
     "json-loader": "^0.5.0",

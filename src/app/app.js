@@ -9,6 +9,12 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
+
+/**
+ * Import Reactions.
+ */
+import {locale_toggle} from './reactions';
 
 /**
  * Import Components.
@@ -36,12 +42,14 @@ export default class extends React.Component {
     // Expected properties.
     static propTypes = {
         children: React.PropTypes.node.isRequired,
-        history: React.PropTypes.object,
-        location: React.PropTypes.object,
-        params: React.PropTypes.object,
-        route: React.PropTypes.object,
-        routeParams: React.PropTypes.object,
-        routes: React.PropTypes.array
+        history: React.PropTypes.object.isRequired,
+        location: React.PropTypes.object.isRequired,
+        params: React.PropTypes.object.isRequired,
+        route: React.PropTypes.object.isRequired,
+        routeParams: React.PropTypes.object.isRequired,
+        routes: React.PropTypes.array.isRequired,
+        state: React.PropTypes.object.isRequired,
+        store: React.PropTypes.object.isRequired
     };
 
     // Expected context properties.
@@ -111,16 +119,18 @@ export default class extends React.Component {
 
     // Render the component.
     render() {
-        // Get the application state.
-        var state = this.context.store.get();
         // Get the properties.
-        const {children} = this.props;
+        const {children, state} = this.props;
         // Calculate the styles.
-        let className = style.root;
+        const className = classnames(style.root);
         // Return the component UI.
         return (
             <div className={className}>
-                <div>{JSON.stringify(state, 4)}</div>
+                <div onClick={() => locale_toggle('A debug message!', true)}>
+                    <FormattedMessage id="app.button"
+                                      description="A button in the application page."
+                                      defaultMessage="Button"/>
+                </div>
                 {children}
             </div>
         );

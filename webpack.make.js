@@ -267,6 +267,11 @@ module.exports = function makeWebpackConfig(options) {
         // Disabled when in test mode or not in build mode
         new ExtractTextPlugin('[name].[hash].css', {
             disable: !BUILD || TEST || TRANSLATE
+        }),
+        // Reference: http://mts.io/2015/04/08/webpack-shims-polyfills/
+        // Inject a polyfill for the given key words
+        new webpack.ProvidePlugin({
+            'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
         })
     ];
 

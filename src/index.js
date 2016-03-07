@@ -23,7 +23,7 @@ import intlMessagesEN from '../public/assets/translations/en.json';
 /**
  * Import Store.
  */
-import Freezer from 'freezer-js';
+import store from './store';
 
 /**
  * Import Routes.
@@ -31,22 +31,28 @@ import Freezer from 'freezer-js';
 import routes from './routes';
 
 /**
- * Import Styles.
+ * Import styles.
  */
+import style from './style';
 
 /**
  * Add internationalization for supported languages.
  */
+// Add all language data for the supported locales.
 addLocaleData(intlDE);
 addLocaleData(intlEN);
 
-/**
- * Create the store. TODO maybe put it in its own file with de/serialization from localstorage?
- */
-const freezer = new Freezer({
-    locale: 'en',
-    messages: intlMessagesEN
-});
+// Convenience function to get the messages for a given locale.
+function intlMessages(locale) {
+    switch (locale) {
+        case 'de':
+            return intlMessagesDE;
+        case 'en':
+            return intlMessagesEN;
+        default:
+            return intlMessagesEN;
+    }
+}
 
 /**
  * The entry point of the application.
@@ -68,7 +74,7 @@ class Index extends React.Component {
     // Set the context property values this component exposes.
     getChildContext() {
         return {
-            store: freezer
+            store: store
         };
     }
 
@@ -85,8 +91,12 @@ class Index extends React.Component {
     // If you want to integrate with other JavaScript frameworks, set timers using setTimeout or setInterval,
     // or send AJAX requests, perform those operations in this method.
     componentDidMount() {
-        // Update the application whenever the store has been updated.
-        freezer.on('update', () => {
+        // Render the application whenever the window size changes.
+        window.addEventListener('resize', () => {
+            this.forceUpdate();
+        });
+        // Render the application whenever the store has been updated.
+        store.on('update', () => {
             this.forceUpdate();
         });
     }
@@ -105,6 +115,8 @@ class Index extends React.Component {
     // If shouldComponentUpdate returns false, then render() will be completely skipped until the next state change.
     // In addition, componentWillUpdate and componentDidUpdate will not be called.
     shouldComponentUpdate(nextProps, nextState) {
+        // This is the root container which propagates all updates and renders the whole application.
+        return true;
     }
 
     // Invoked immediately before rendering when new props or state are being received.
@@ -127,14 +139,19 @@ class Index extends React.Component {
     componentWillUnmount() {
     }
 
+    // Add additional properties to the route components.
+    createElement(Component, props) {
+        return <Component {...props} store={store} state={store.get()}/>;
+    }
+
     // Render the component.
     render() {
         // Get the application state.
-        var state = freezer.get();
+        const state = store.get();
         // Return the component UI.
         return (
-            <IntlProvider locale={state.locale} messages={state.messages}>
-                <Router history={browserHistory} routes={routes}/>
+            <IntlProvider locale={state.locale} messages={intlMessages(state.locale)}>
+                <Router history={browserHistory} routes={routes} createElement={this.createElement}/>
             </IntlProvider>
         );
     }
@@ -144,9 +161,12 @@ class Index extends React.Component {
  * (Re-)Render the application.
  */
 function render() {
+    // Set the index style.
+    document.getElementById('index').className = style.root;
+    // Render the application.
     ReactDOM.render(
         <Index/>,
-        document.getElementById('root')
+        document.getElementById('index')
     );
 }
 

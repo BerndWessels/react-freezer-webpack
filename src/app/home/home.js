@@ -9,6 +9,12 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
+
+/**
+ * Import Reactions.
+ */
+import {something_update} from './reactions';
 
 /**
  * Import Components.
@@ -31,17 +37,19 @@ import {IntlProvider, FormattedMessage} from 'react-intl';
 /**
  * The component.
  */
-export default class Home extends React.Component {
+export default class extends React.Component {
 
     // Expected properties.
     static propTypes = {
         children: React.PropTypes.node,
-        history: React.PropTypes.object,
-        location: React.PropTypes.object,
-        params: React.PropTypes.object,
-        route: React.PropTypes.object,
-        routeParams: React.PropTypes.object,
-        routes: React.PropTypes.array
+        history: React.PropTypes.object.isRequired,
+        location: React.PropTypes.object.isRequired,
+        params: React.PropTypes.object.isRequired,
+        route: React.PropTypes.object.isRequired,
+        routeParams: React.PropTypes.object.isRequired,
+        routes: React.PropTypes.array.isRequired,
+        state: React.PropTypes.object.isRequired,
+        store: React.PropTypes.object.isRequired
     };
 
     // Expected context properties.
@@ -111,17 +119,15 @@ export default class Home extends React.Component {
 
     // Render the component.
     render() {
-        // Get the application state.
-        var state = this.context.store.get();
-        console.log(this.props);
         // Get the properties.
-        // const {children} = this.props;
+        const {state} = this.props;
         // Calculate the styles.
-        let className = style.root;
+        const className = classnames(style.root);
         // Return the component UI.
         return (
             <div className={className} onClick={()=>{state.set({x: Math.random()});}}>
-                <h3>{JSON.stringify(this.props, 4)}</h3>
+                <input type="text" value={state.app.home.something} onChange={(e) => something_update(e.target.value)}/>
+                <div>{JSON.stringify(state, 4)}</div>
             </div>
         );
     }
