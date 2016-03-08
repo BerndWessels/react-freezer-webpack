@@ -12,6 +12,11 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 /**
+ * Import Entities.
+ */
+import {getEntity} from '../store';
+
+/**
  * Import Reactions.
  */
 import {locale_toggle} from './reactions';
@@ -121,6 +126,8 @@ export default class extends React.Component {
     render() {
         // Get the properties.
         const {children, state} = this.props;
+        // Get the entities.
+        var user = getEntity('user', 2);
         // Calculate the styles.
         const className = classnames(style.root);
         // Return the component UI.
@@ -131,6 +138,7 @@ export default class extends React.Component {
                                       description="A button in the application page."
                                       defaultMessage="Button"/>
                 </div>
+                <h1>{user.firstName}</h1>
                 {children}
             </div>
         );

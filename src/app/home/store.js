@@ -8,5 +8,6 @@
  */
 
 export default {
-    something: 4711
+    something: 4711,
+    selectedUsers: [2, 3]
 }

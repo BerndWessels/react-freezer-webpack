@@ -12,9 +12,14 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 /**
+ * Import Entities.
+ */
+import {getEntities} from '../../store';
+
+/**
  * Import Reactions.
  */
-import {something_update} from './reactions';
+import {something_update, user_update} from './reactions';
 
 /**
  * Import Components.
@@ -119,8 +124,11 @@ export default class extends React.Component {
 
     // Render the component.
     render() {
+        console.log('render');
         // Get the properties.
         const {state} = this.props;
+        // Get the entities.
+        var selectedUsers = getEntities('user', state.app.home.selectedUsers);
         // Calculate the styles.
         const className = classnames(style.root);
         // Return the component UI.
@@ -128,6 +136,16 @@ export default class extends React.Component {
             <div className={className} onClick={()=>{state.set({x: Math.random()});}}>
                 <input type="text" value={state.app.home.something} onChange={(e) => something_update(e.target.value)}/>
                 <div>{JSON.stringify(state, 4)}</div>
+                <ul>
+                    {selectedUsers.map((user) => {
+                        return (
+                            <li key={user.id}>
+                                <input type="text" value={user.firstName}
+                                       onChange={(e) => user_update(Object.assign({}, user, {firstName: e.target.value}))}/>
+                            </li>
+                        );
+                    })}
+                </ul>
             </div>
         );
     }

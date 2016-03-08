@@ -14,7 +14,7 @@ let exports = {};
 /**
  * Toggle the locale.
  */
-createReaction(store, exports, 'locale:toggle', (a, b) => {
+createReaction(exports, 'locale:toggle', (a, b) => {
     console.log(a, b);
     fetch('http://tiny-url.info/api/v1/random', {
         method: 'post',
