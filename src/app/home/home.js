@@ -19,11 +19,12 @@ import {getEntities} from '../../store';
 /**
  * Import Reactions.
  */
-import {something_update, user_update} from './reactions';
+import {homepage_initialize, something_update, user_update} from './reactions';
 
 /**
  * Import Components.
  */
+import UserPanel from '../../components/userPanel';
 
 /**
  * Import UX components.
@@ -80,6 +81,8 @@ export default class extends React.Component {
     // If you want to integrate with other JavaScript frameworks, set timers using setTimeout or setInterval,
     // or send AJAX requests, perform those operations in this method.
     componentDidMount() {
+        console.log('Home mounting');
+        homepage_initialize();
     }
 
     // Invoked when a component is receiving new props. This method is not called for the initial render.
@@ -124,13 +127,13 @@ export default class extends React.Component {
 
     // Render the component.
     render() {
-        console.log('render');
         // Get the properties.
         const {state} = this.props;
+        console.log(state.app.home.loading);
         // Get the entities.
         var selectedUsers = getEntities('user', state.app.home.selectedUsers);
         // Calculate the styles.
-        const className = classnames(style.root);
+        const className = classnames(style.root, {[`${style.loading}`]: state.app.home.loading});
         // Return the component UI.
         return (
             <div className={className} onClick={()=>{state.set({x: Math.random()});}}>
@@ -140,8 +143,7 @@ export default class extends React.Component {
                     {selectedUsers.map((user) => {
                         return (
                             <li key={user.id}>
-                                <input type="text" value={user.firstName}
-                                       onChange={(e) => user_update(Object.assign({}, user, {firstName: e.target.value}))}/>
+                                <UserPanel user={user} handleUserUpdate={user_update}/>
                             </li>
                         );
                     })}

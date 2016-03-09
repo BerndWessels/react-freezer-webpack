@@ -15,6 +15,7 @@ import {IndexRoute, Route} from 'react-router';
  */
 import App from './app/app';
 import Home from './app/home/home';
+import Settings from './app/settings/settings';
 
 /**
  * The application's routing structure.
@@ -22,5 +23,6 @@ import Home from './app/home/home';
 export default (
     <Route path="/" component={App}>
         <IndexRoute component={Home}/>
+        <Route path="/settings" component={Settings}/>
     </Route>
 );

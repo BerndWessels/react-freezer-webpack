@@ -8,6 +8,7 @@
  */
 
 export default {
+    isInitialized: false,
     something: 4711,
     selectedUsers: [2, 3]
 }

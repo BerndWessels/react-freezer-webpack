@@ -9,6 +9,15 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
+
+/**
+ * Import Entities.
+ */
+
+/**
+ * Import Reactions.
+ */
 
 /**
  * Import Components.
@@ -21,7 +30,6 @@ import ReactDOM from 'react-dom';
 /**
  * Import styles.
  */
-import style from './style';
 
 /**
  * Import Internationalization.
@@ -31,10 +39,19 @@ import {IntlProvider, FormattedMessage} from 'react-intl';
 /**
  * The component.
  */
-export default class TodoList extends React.Component {
+export default class extends React.Component {
+
     // Expected properties.
     static propTypes = {
-        todos: React.PropTypes.array
+        children: React.PropTypes.node,
+        history: React.PropTypes.object.isRequired,
+        location: React.PropTypes.object.isRequired,
+        params: React.PropTypes.object.isRequired,
+        route: React.PropTypes.object.isRequired,
+        routeParams: React.PropTypes.object.isRequired,
+        routes: React.PropTypes.array.isRequired,
+        state: React.PropTypes.object.isRequired,
+        store: React.PropTypes.object.isRequired
     };
 
     // Expected context properties.
@@ -51,6 +68,7 @@ export default class TodoList extends React.Component {
     // If you call setState within this method,
     // render() will see the updated state and will be executed only once despite the state change.
     componentWillMount() {
+        console.log('Settings mounting');
     }
 
     // Invoked once, only on the client (not on the server), immediately after the initial rendering occurs.
@@ -76,10 +94,10 @@ export default class TodoList extends React.Component {
     // If shouldComponentUpdate returns false, then render() will be completely skipped until the next state change.
     // In addition, componentWillUpdate and componentDidUpdate will not be called.
     shouldComponentUpdate(nextProps, nextState) {
-        console.log(nextProps);
-        console.log(React.addons.shallowCompare(this, nextProps, nextState));
-        // This is a pure component.
-        return React.addons.shallowCompare(this, nextProps, nextState);
+        // This is not a pure component.
+        // Basically the whole store's state is a prop which means
+        // we always have to update the component when the store's state changes.
+        return true;
     }
 
     // Invoked immediately before rendering when new props or state are being received.
@@ -104,17 +122,10 @@ export default class TodoList extends React.Component {
 
     // Render the component.
     render() {
-        // Get the application state.
-        var state = this.context.store.get();
-        // Get the properties.
-        // const {children} = this.props;
-        // Calculate the styles.
-        let className = style.root;
+        console.log('render settings');
         // Return the component UI.
         return (
-            <div className={className} onClick={()=>{console.log(state.set({x: Math.random()}));}}>
-                <h1>{JSON.stringify(this.props)}</h1>
-            </div>
+            <div></div>
         );
     }
 }

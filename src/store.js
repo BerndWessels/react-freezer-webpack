@@ -13,24 +13,9 @@ import app from './app/store';
 const store = new Freezer({
     locale: 'en',
     app: app,
+    // Entity cache is not pluralized to better reflect types.
     entities: {
-        user: [{
-            id: 1,
-            firstName: 'Bernd',
-            lastName: 'Wessels'
-        }, {
-            id: 2,
-            firstName: 'Christine',
-            lastName: 'Caballo'
-        }, {
-            id: 3,
-            firstName: 'Sophie Anne',
-            lastName: 'Caballo Wessels'
-        }, {
-            id: 4,
-            firstName: 'John Paul',
-            lastName: 'Caballo Wessels'
-        }]
+        user: []
     }
 });
 
@@ -58,6 +43,23 @@ export function getEntities(type, ids) {
 export function setEntity(type, updatedEntity) {
     const state = store.get();
     var index = state.entities[type].findIndex(entity => entity.id === updatedEntity.id);
-    // TODO possible index === -1 once we find a way to cleanup the cache?
-    state.entities[type].set(index, updatedEntity);
+    if (index === -1) {
+        state.entities[type].push(updatedEntity);
+    } else {
+        state.entities[type].set(index, updatedEntity);
+    }
+}
+
+export function setEntities(type, updatedEntities) {
+    const state = store.get();
+    let entities = state.entities[type].transact();
+    updatedEntities.forEach((updatedEntity) => {
+        var index = entities.findIndex(entity => entity.id === updatedEntity.id);
+        if (index === -1) {
+            entities.push(updatedEntity);
+        } else {
+            entities[index] = updatedEntity;
+        }
+    });
+    state.entities[type].run();
 }
