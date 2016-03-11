@@ -12,6 +12,7 @@ let dbUser = {
             title: 'ticket 0',
             content: 'content 0',
             user: {
+                id: 1,
                 tickets: null,
                 currentTicket: null,
                 report: null,
@@ -23,9 +24,13 @@ let dbUser = {
             title: 'ticket 1',
             content: 'content 1',
             user: {
+                id: 2,
                 tickets: null,
                 currentTicket: null,
-                report: null,
+                report: {
+                    id: 101,
+                    overallStatus: 815
+                },
                 email: null
             }
         }
@@ -35,6 +40,7 @@ let dbUser = {
         title: 'ticket c',
         content: 'content c',
         user: {
+            id: 3,
             tickets: null,
             currentTicket: null,
             report: null,
@@ -49,9 +55,14 @@ let dbUser = {
 
 const User = {
     tickets: {
-        type: '[Ticket]',
+        type: 'Ticket',
         resolve: (dbUser) => {
-            return dbUser.tickets;
+            var deferred = q.defer();
+            setTimeout(()=> {
+                console.log('!!!!!!!!');
+                deferred.resolve(dbUser.tickets);
+            }, 2000);
+            return deferred.promise;
         }
     },
     currentTicket: {
@@ -115,6 +126,7 @@ var qlQuery = `
             title
             user(limit: 5, offset: 'none') {
                 email
+                report
             }
         }
         currentTicket {
@@ -136,7 +148,7 @@ function executeQuery(query) {
     //console.log(JSON.stringify({
     //    user: executeNode(query.props.user, User, dbUser);
     //}, null, '\t'));
-    executeNode(query.props.user, User, dbUser).then((result) => console.log('!', result));
+    executeNode(query.props.user, User, dbUser).then((result) => console.log(JSON.stringify(result, null, 4)));
 }
 
 var stop = 0;
@@ -148,25 +160,8 @@ function executeNode(node, type, dbEntity) {
         for (let propName in node.props) {
             let propNode = node.props[propName];
             let propType = type[propName] ? type[propName].type : null;
-            //var propValue = type[prop] ? type[prop].resolve(dbEntity) : dbEntity[prop];
             resolvePromisesMeta.push({propName, propNode, propType});
-            resolvePromises.push(propValue(propName, propNode, propType, dbEntity));
-                /*
-                if (propNode !== null && propNode.hasOwnProperty('props') && propNode.props !== null) {
-                    if (Array.isArray(resolvedValue)) {
-                        result[propName] = [];
-                        resolvedValue.forEach((item) => {
-                            result[propName].push(executeNode(propNode, typeFromString(propType), item));
-                        })
-                    } else {
-                        result[propName] = executeNode(propNode, typeFromString(propType), resolvedValue);
-                    }
-                } else {
-                    result[propName] = resolvedValue;
-                }
-                */
-
-
+            resolvePromises.push(propValue(propName, type, dbEntity));
         }
     }
     else {
@@ -182,37 +177,40 @@ function executeNode(node, type, dbEntity) {
                 let propNode = resolvePromisesMeta[resolveResultIndex].propNode;
                 let propType = resolvePromisesMeta[resolveResultIndex].propType;
 
-                propsPromisesMeta.push({propName, propNode, propType});
                 if (propNode !== null && propNode.hasOwnProperty('props') && propNode.props !== null) {
                     if (Array.isArray(resolvedValue)) {
                         resolvedValue.forEach((resolvedValueItem) => {
+                            propsPromisesMeta.push({propName, isArray: true});
                             propsPromises.push(executeNode(propNode, typeFromString(propType), resolvedValueItem));
                         })
                     } else {
+                        propsPromisesMeta.push({propName});
                         propsPromises.push(executeNode(propNode, typeFromString(propType), resolvedValue));
                     }
                 } else {
+                    propsPromisesMeta.push({propName});
                     propsPromises.push(q.fcall(()=>resolvedValue));
                 }
 
             });
-            return q.allSettled(propsPromises).then((propsResults)=>{
+            return q.allSettled(propsPromises).then((propsResults)=> {
                 var result = {};
                 propsResults.forEach((propsResult, propsResultIndex) => {
                     let resolvedValue = propsResult.value;
                     let propName = propsPromisesMeta[propsResultIndex].propName;
-                    let propNode = propsPromisesMeta[propsResultIndex].propNode;
-                    let propType = propsPromisesMeta[propsResultIndex].propType;
-                    //console.log(propName, resolvedValue);
-                    result[propName] = resolvedValue;
+                    let isArray = propsPromisesMeta[propsResultIndex].isArray;
+                    if (isArray) {
+                        result.hasOwnProperty(propName) ? result[propName].push(resolvedValue) : result[propName] = [resolvedValue];
+                    } else {
+                        result[propName] = resolvedValue;
+                    }
                 });
-                console.log(result);
                 return result;
             });
         });
 }
 
-function propValue(propName, propNode, propType, propData) {
+function propValue(propName, propType, propData) {
     let resolvePromise;
     let resolveFunction = propType && propType[propName] ? propType[propName].resolve : null;
     if (resolveFunction) {
@@ -223,7 +221,9 @@ function propValue(propName, propNode, propType, propData) {
             resolvePromise = q.fcall(()=>resolved);
         }
     } else {
-        resolvePromise = q.fcall(()=>{return propData[propName];});
+        resolvePromise = q.fcall(()=> {
+            return propData[propName];
+        });
     }
     return resolvePromise;
 }
