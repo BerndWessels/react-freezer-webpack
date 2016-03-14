@@ -14,12 +14,12 @@ module.exports = {
 
         query.match(/\s*(.*)[\s{]/g).forEach((_node, _nodeIndex)=> {
             _node = _node.trim();
-            let params = [];
+            let params = {};
             let _params = _node.match(/\((.*)\)/); // TODO this can break!
             if (_params) {
                 _params[1].match(/([^,:\s]+)/g).forEach((_param, _paramIndex, _paramArray)=> {
                     if (_paramIndex % 2 === 0) {
-                        params.push({[_param]: _paramArray[_paramIndex + 1]});
+                        params[_param] = _paramArray[_paramIndex + 1];
                     }
                 });
             }

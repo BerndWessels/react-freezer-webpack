@@ -2,8 +2,16 @@
 
 const q = require('q');
 const parser = require('./parser');
+const _ = require('lodash');
 
-let dbUser = {
+
+
+
+
+
+
+
+const dbUser = {
     id: 0,
     email: 'bernd@wessels.de',
     tickets: [
@@ -51,7 +59,7 @@ let dbUser = {
         id: 100,
         overallStatus: 4711
     }
-}
+};
 
 const User = {
     tickets: {
@@ -60,7 +68,7 @@ const User = {
             var deferred = q.defer();
             setTimeout(()=> {
                 deferred.resolve(dbUser.tickets);
-            }, 1000);
+            }, 100);
             return deferred.promise;
         }
     },
@@ -76,6 +84,24 @@ const User = {
             return dbUser.report;
         }
     }
+};
+
+class Something {
+    constructor() {
+        this.tickets = {
+            type: 'Bernd'
+        };
+        this.bla = {
+            type: Something
+        }
+    }
+}
+
+var x = new Something();
+
+console.log(x);
+for(let d in x){
+    console.log(d);
 }
 
 const Ticket = {
@@ -93,15 +119,16 @@ const Ticket = {
     },
     owner: {
         type: 'User',
-        resolve: (dbTicket) => {
+        resolve: (dbTicket, args) => {
+            console.log(args);
             var deferred = q.defer();
             setTimeout(()=> {
                 deferred.resolve(dbTicket.owner);
-            }, 2000);
+            }, 200);
             return deferred.promise;
         }
     }
-}
+};
 
 const Report = {
     overallStatus: {
@@ -110,7 +137,35 @@ const Report = {
             return dbTicket.overallStatus;
         }
     }
-}
+};
+
+const Query = {
+    viewer: {
+        type: 'User',
+        resolve: (_) => {
+            var deferred = q.defer();
+            setTimeout(()=> {
+                deferred.resolve(dbUser);
+            }, 200);
+            return deferred.promise;
+        }
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function typeFromString(type) {
     switch (type.replace(/[\[\]]/g, '')) {
@@ -123,54 +178,15 @@ function typeFromString(type) {
     }
 }
 
-var qlQuery = `
-    viewer {
-        email
-        tickets {
-            title
-            owner(limit: 5, offset: 'none') {
-                email
-                report {
-                    overallStatus
-                }
-            }
-        }
-        currentTicket {
-            content
-        }
-        report {
-            overallStatus
-        }
-    }
-`;
-
-var jsonQuery = parser.parse(qlQuery);
-
-//console.log(JSON.stringify(jsonQuery, null, 2));
-
-const Query = {
-    viewer: {
-        type: 'User',
-        resolve: (_) => {
-            var deferred = q.defer();
-            setTimeout(()=> {
-                deferred.resolve(dbUser);
-            }, 2000);
-            return deferred.promise;
-        }
-    }
-};
-
-executeQuery(jsonQuery, Query);
-
 function executeQuery(jsonQuery, queryType) {
     queryNode(jsonQuery, queryType, null).then((result)=> {
-        console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(result, null, 2))
+        processQueryResult(result);
     });
 }
 
 function queryNode(node, nodeType, nodeData) {
-    let result = {};
+    let result = nodeData && nodeData.hasOwnProperty('id') ? {id: nodeData.id} : {};
     let dataPromises = [];
     let dataPromisesMeta = [];
     let nodePromises = [];
@@ -178,23 +194,24 @@ function queryNode(node, nodeType, nodeData) {
     // Resolve all properties of this node.
     for (let propName in node.props) {
         let propData = null;
+        let isPromised = false;
         let propType = nodeType[propName];
         if (!propType) {
             propData = nodeData[propName];
         } else if (!propType.hasOwnProperty('resolve')) {
             propData = nodeData[propName];
         } else {
-            let resolved = propType.resolve(nodeData /*, propArgs */);
+            let resolved = propType.resolve(nodeData, node.props[propName].params);
             if (!q.isPromiseAlike(resolved)) {
                 propData = resolved;
             } else {
-                var x = true;
+                isPromised = true;
                 dataPromisesMeta.push(propName);
                 dataPromises.push(resolved);
             }
         }
         // Process already resolved properties right away.
-        if (propData) {
+        if (propData !== null) {
             if (propType && propType.type) {
                 let propNode = node.props[propName];
                 if (Array.isArray(propData)) {
@@ -209,10 +226,8 @@ function queryNode(node, nodeType, nodeData) {
             } else {
                 result[propName] = propData;
             }
-        } else if(!x) {
+        } else if (!isPromised) {
             result[propName] = null;
-            console.log(propName);
-            x = false;
         }
     }
     // Process remaining properties once they are resolved.
@@ -254,3 +269,72 @@ function queryNode(node, nodeType, nodeData) {
             });
         });
 }
+
+
+function processQueryResult(jsonQueryResult) {
+    processQueryResultNode(jsonQueryResult, Query, null);
+    console.log(JSON.stringify(entities, null, 2));
+}
+
+let entities = {
+    User: {},
+    Ticket: {},
+    Report: {}
+};
+
+function processQueryResultNode(node, nodeType, entityType) {
+    for (let propName in node) {
+        let prop = node[propName];
+        let propType = nodeType[propName];
+        if (propType && propType.type && prop !== null) {
+            if (Array.isArray(prop)) {
+                let propItemIds = [];
+                prop.forEach((propItem) => {
+                    propItemIds.push(processQueryResultNode(propItem, typeFromString(propType.type), propType.type));
+                });
+                node[propName] = propItemIds;
+            } else {
+                node[propName] = processQueryResultNode(prop, typeFromString(propType.type), propType.type);
+            }
+        }
+    }
+    if(entityType) {
+        entities[entityType][node.id] = _.omit(node, 'id');
+    }
+    return node.id;
+}
+
+
+
+
+
+
+
+
+
+var qlQuery = `
+    viewer {
+        id
+        email
+        tickets {
+            title
+            owner(limit: 5, offset: 'none') {
+                email
+                report {
+                    overallStatus
+                }
+            }
+        }
+        currentTicket {
+            content
+        }
+        report {
+            overallStatus
+        }
+    }
+`;
+
+var jsonQuery = parser.parse(qlQuery);
+
+executeQuery(jsonQuery, Query);
+
