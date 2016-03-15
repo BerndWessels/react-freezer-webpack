@@ -10,6 +10,7 @@
 import {default as store, createReaction, setEntity, setEntities} from '../../store';
 
 let exports = {};
+
 /**
  * Load initial homepage data.
  */
@@ -21,6 +22,29 @@ createReaction(exports, 'homepage:initialize', () => {
         }
         state.app.home.set('loading', true);
     }
+
+
+    fetch('http://127.0.0.1:8088', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            Authorization: 'Client-ID dc708f3823b7756',
+            "Content-type": "application/json; charset=UTF-8"
+        },
+        //mode: 'no-cors',
+        body: JSON.stringify({
+            query: `viewer {
+                        email
+                        tickets {
+                            title
+                        }
+                    }`
+        })
+    }).then((response) => {
+        console.log(response);
+    });
+
+
     // Fake server request.
     setTimeout(()=> {
         const serverResponse = {

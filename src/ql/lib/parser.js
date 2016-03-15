@@ -30,8 +30,11 @@ module.exports = {
             } else if (_node === '}') {
                 currentPath.pop();
             } else {
-                let _nodeName = _node.match(/^([\w]+)/)[1];
-                currentNode().props[_nodeName] = {props: null, params: params};
+                let match = _node.match(/^([\w]+)/);
+                if(match) {
+                    let _nodeName = match[1];
+                    currentNode().props[_nodeName] = {props: null, params: params};
+                }
             }
         });
 
