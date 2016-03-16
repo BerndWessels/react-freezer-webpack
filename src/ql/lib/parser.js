@@ -1,6 +1,6 @@
 "use strict";
 module.exports = {
-    parse: function(query) {
+    parse: function(q) {
         let rootNode = {props: {}, params: null};
         let currentPath = [];
 
@@ -12,7 +12,48 @@ module.exports = {
             return currentNode;
         }
 
-        query.match(/\s*(.*)[\s{]/g).forEach((_node, _nodeIndex)=> {
+        let b = '';
+        let i = 0;
+        do {
+            while (/[\s{]/.test(q[i])) i++;
+            if(/\(/.test(q[i])){
+                i++;
+                let quotes = false;
+                let p = '';
+                while(!(/\)/.test(q[i]) && !quotes)){
+                    if(/"/.test(q[i]) && !/\\/.test(q[-1])) quotes = !quotes;
+                    p += q[i++];
+                }
+                //console.log('param', p.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": '));
+                currentNode().props[b].params = JSON.parse('{' + p.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ') + '}');
+                while (/\s/.test(q[++i]));
+            }
+            b = '';
+            while (!/[\s{}(]/.test(q[i])) b += q[i++];
+            while (/\s/.test(q[i])) i++;
+            if(/{/.test(q[i])){
+                currentNode().props[b] = {props: {}, params: null};
+                currentPath.push(b);
+                //console.log('new node', b);
+                i++;
+            }
+            else if(/}/.test(q[i])){
+                if(b.length > 0){
+                    currentNode().props[b] = {props: {}, params: null};
+                    //console.log('new prop', b);
+                }
+                currentPath.pop();
+                //console.log('close node');
+                i++;
+            }
+            else{
+                currentNode().props[b] = {props: {}, params: null};
+                //console.log('new prop', b);
+            }
+        } while (i < q.length);
+
+        /*
+        q.match(/\s*(.*)[\s{]/g).forEach((_node, _nodeIndex)=> {
             _node = _node.trim();
             let params = {};
             let _params = _node.match(/\((.*)\)/); // TODO this can break!
@@ -37,6 +78,7 @@ module.exports = {
                 }
             }
         });
+        */
 
         return rootNode;
     }
