@@ -9,74 +9,41 @@
 
 import {default as store, createReaction, setEntity, setEntities} from '../../store';
 
+import fetch from '../../ql/lib/fetch';
+
 let exports = {};
 
 /**
  * Load initial homepage data.
  */
 createReaction(exports, 'homepage:initialize', () => {
-    {
-        const state = store.get();
-        if (state.app.home.isInitialized) {
-            return;
-        }
-        state.app.home.set('loading', true);
+    const state = store.get();
+    if (state.app.home.isInitialized) {
+        return;
     }
-
-
-    fetch('http://127.0.0.1:8088', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            Authorization: 'Client-ID dc708f3823b7756',
-            "Content-type": "application/json; charset=UTF-8"
-        },
-        //mode: 'no-cors',
-        body: JSON.stringify({
-            query: `viewer {
-                        email
-                        tickets {
-                            title
-                        }
-                    }`
-        })
-    }).then((response) => {
-        console.log(response);
-    });
-
-
-    // Fake server request.
-    setTimeout(()=> {
-        const serverResponse = {
-            users: [{
-                id: 1,
-                firstName: 'Bernd',
-                lastName: 'Wessels'
-            }, {
-                id: 2,
-                firstName: 'Christine',
-                lastName: 'Caballo'
-            }, {
-                id: 3,
-                firstName: 'Sophie Anne',
-                lastName: 'Caballo Wessels'
-            }, {
-                id: 4,
-                firstName: 'John Paul',
-                lastName: 'Caballo Wessels'
-            }]
-        };
-        setEntities('user', serverResponse.users);
+    state.app.home.set('loading', true);
+    fetch(`viewer {
+            firstName
+            email
+            posts {
+                title
+                comments {
+                    content
+                }
+            }
+          }`
+    ).then((queryValue) => {
         const state = store.get();
         let home = state.app.home.transact();
         home.loading = false;
         home.isInitialized = true;
+        home.viewer = queryValue.viewer;
         state.app.home.run();
-    }, 1000);
+    });
 });
 
 /**
- * Toggle the locale.
+ * TODO this is just an example to show the use of custom reaction triggers.
  */
 createReaction(exports, 'something:update', (value) => {
     const state = store.get();
@@ -90,7 +57,7 @@ createReaction(exports, 'something:update', (value) => {
  */
 createReaction(exports, 'user:update', (updatedUser) => {
     // TODO maybe add validation here or in the trigger?
-    setEntity('user', updatedUser);
+    setEntity('User', updatedUser);
 });
 
 module.exports = exports;

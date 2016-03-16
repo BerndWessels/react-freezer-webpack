@@ -104,7 +104,6 @@ module.exports = {
             owner: {
                 type: 'User',
                 resolve: (dbTicket, args) => {
-                    console.log(args);
                     var deferred = q.defer();
                     setTimeout(()=> {
                         deferred.resolve(dbTicket.owner);

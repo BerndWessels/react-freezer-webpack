@@ -68,7 +68,6 @@ export default class extends React.Component {
     // If you call setState within this method,
     // render() will see the updated state and will be executed only once despite the state change.
     componentWillMount() {
-        console.log('Settings mounting');
     }
 
     // Invoked once, only on the client (not on the server), immediately after the initial rendering occurs.
@@ -122,10 +121,9 @@ export default class extends React.Component {
 
     // Render the component.
     render() {
-        console.log('render settings');
         // Return the component UI.
         return (
-            <div></div>
+            <div>Settings</div>
         );
     }
 }

@@ -19,17 +19,6 @@ import schema from '../src/data/ql/qlSchema';
  * Serves the GraphQL data endpoint.
  */
 export default task('serve data', async () => {
-
-
-    let query = `
-    viewer {
-        email
-    }`;
-    let jsonQuery = parse(query);
-    console.log(JSON.stringify(jsonQuery,null, 2));
-    return;
-
-
     // Development data port.
     const GRAPHQL_PORT = 8088;
 
@@ -49,18 +38,12 @@ export default task('serve data', async () => {
         console.log(JSON.stringify(req.headers, null, 2));
         console.log(req.body.query.trim());
         let jsonQuery = parse(req.body.query.trim());
-        jsonQuery = `
-    viewer {
-        email
-    }
-`;
-
         console.log(JSON.stringify(jsonQuery, null, 2));
-        //executeQuery(sampleSchema.schema, jsonQuery).then((result)=> {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ a: 1 }));
-        //let jsonQuery = parser.parse(qlQuery);
-        //executeQuery(sampleSchema.schema, jsonQuery).then((result)=> {
+        executeQuery(schema, jsonQuery).then((result)=> {
+            console.log(result);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify(result));
+        });
     });
     // Run the server.
     server.listen(GRAPHQL_PORT, () => console.log(

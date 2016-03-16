@@ -14,7 +14,7 @@ import classnames from 'classnames';
 /**
  * Import Entities.
  */
-import {getEntities} from '../../store';
+import {getEntity} from '../../store';
 
 /**
  * Import Reactions.
@@ -24,7 +24,7 @@ import {homepage_initialize, something_update, user_update} from './reactions';
 /**
  * Import Components.
  */
-import UserPanel from '../../components/userPanel';
+import UserPanel from '../../components/userPanel/userPanel';
 
 /**
  * Import UX components.
@@ -81,7 +81,6 @@ export default class extends React.Component {
     // If you want to integrate with other JavaScript frameworks, set timers using setTimeout or setInterval,
     // or send AJAX requests, perform those operations in this method.
     componentDidMount() {
-        console.log('Home mounting');
         homepage_initialize();
     }
 
@@ -129,24 +128,27 @@ export default class extends React.Component {
     render() {
         // Get the properties.
         const {state} = this.props;
-        console.log(state.app.home.loading);
         // Get the entities.
-        var selectedUsers = getEntities('user', state.app.home.selectedUsers);
+        var viewer = getEntity('User', state.app.home.viewer);
         // Calculate the styles.
         const className = classnames(style.root, {[`${style.loading}`]: state.app.home.loading});
         // Return the component UI.
         return (
-            <div className={className} onClick={()=>{state.set({x: Math.random()});}}>
-                <input type="text" value={state.app.home.something} onChange={(e) => something_update(e.target.value)}/>
-                <div>{JSON.stringify(state, 4)}</div>
+            <div className={className}>
                 <ul>
-                    {selectedUsers.map((user) => {
-                        return (
-                            <li key={user.id}>
-                                <UserPanel user={user} handleUserUpdate={user_update}/>
-                            </li>
-                        );
-                    })}
+                    <li>
+                        <input type="text" value={state.app.home.something}
+                               onChange={(e) => something_update(e.target.value)}/>
+                    </li>
+                    {(()=> {
+                        if (viewer) {
+                            return (
+                                <li>
+                                    <UserPanel user={viewer} handleUserUpdate={user_update}/>
+                                </li>
+                            );
+                        }
+                    })()}
                 </ul>
             </div>
         );

@@ -8,7 +8,7 @@ function executeQuery(schema, jsonQuery) {
 }
 
 function queryNode(schema, node, nodeType, nodeData) {
-    let result = nodeData && nodeData.hasOwnProperty('id') ? {id: nodeData.id} : {};
+    let result = nodeData && nodeData['id'] !== undefined ? {id: nodeData['id']} : {};
     let dataPromises = [];
     let dataPromisesMeta = [];
     let nodePromises = [];
@@ -114,7 +114,7 @@ function processQueryResultNode(schema, entities, node, nodeType, entityType) {
         }
     }
     if (entityType) {
-        entities[entityType][node.id] = _.omit(node, 'id');
+        entities[entityType][node.id] = node; //_.omit(node, 'id');
         return node.id;
     } else {
         return node;

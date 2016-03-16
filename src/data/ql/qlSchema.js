@@ -15,7 +15,7 @@ export default {
         viewer: {
             type: 'User',
             resolve: (_) => {
-                return db.User.findOne({where: {id: 2}});
+                return db.User.findOne({where: {id: 1}});
             }
         }
     },

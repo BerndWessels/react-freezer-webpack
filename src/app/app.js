@@ -128,7 +128,7 @@ export default class extends React.Component {
         // Get the properties.
         const {children, state} = this.props;
         // Get the entities.
-        var user = getEntity('user', 2);
+        var user = getEntity('User', 1);
         // Calculate the styles.
         const className = classnames(style.root);
         // Return the component UI.

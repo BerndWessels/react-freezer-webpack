@@ -9,6 +9,7 @@
     "database:fake": "babel-node --eval \"var script = require('./scripts/databaseFake'); script.default().catch(err => console.error(err.stack))\"",
     "postinstall": "babel-node --eval \"var script = require('./scripts/externalsUpdate'); script.default().catch(err => console.error(err.stack))\"",
     "schema:serve": "babel-node --eval \"var script = require('./scripts/schemaServe'); script.default().catch(err => console.error(err.stack))\"",
+    "schema:update": "babel-node --eval \"var script = require('./scripts/schemaUpdate'); script.default().catch(err => console.error(err.stack))\"",
     "start": "webpack-dev-server --history-api-fallback --inline --progress --hot --watch",
     "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js \"test/**/*.@(js|jsx)\"",
     "test:watch": "npm run test -- --watch",

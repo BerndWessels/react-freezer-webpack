@@ -15,8 +15,12 @@ const store = new Freezer({
     app: app,
     // Entity cache is not pluralized to better reflect types.
     entities: {
-        user: []
+        User: {},
+        Post: {},
+        Comment: {}
     }
+}, {
+    mutable: true
 });
 
 export default store;
@@ -30,36 +34,50 @@ export function createReaction(exports, name, handler, trigger) {
 
 export function getEntity(type, id) {
     const state = store.get();
-    return state.entities[type].find(entity => id === entity.id);
+    return state.entities[type][id];
 }
 
 export function getEntities(type, ids) {
     const state = store.get();
-    return state.entities[type].filter(entity => {
-        return ids.findIndex(id => id == entity.id) !== -1;
+    var entities = [];
+    ids.forEach(id => {
+        if (state.entities[type].hasOwnProperty(id)) {
+            entities.push(state.entities[type][id]);
+        }
     });
+    return entities;
+    //return state.entities[type].filter(entity => {
+    //    return ids.findIndex(id => id == entity.id) !== -1;
+    //});
 }
 
 export function setEntity(type, updatedEntity) {
     const state = store.get();
-    var index = state.entities[type].findIndex(entity => entity.id === updatedEntity.id);
-    if (index === -1) {
-        state.entities[type].push(updatedEntity);
-    } else {
-        state.entities[type].set(index, updatedEntity);
-    }
+    let entities = state.entities[type].transact();
+    entities[updatedEntity.id] = updatedEntity;
+    state.entities[type].run();
+    //var index = state.entities[type].findIndex(entity => entity.id === updatedEntity.id);
+    //if (index === -1) {
+    //    state.entities[type].push(updatedEntity);
+    //} else {
+    //    state.entities[type].set(index, updatedEntity);
+    //}
 }
 
 export function setEntities(type, updatedEntities) {
     const state = store.get();
     let entities = state.entities[type].transact();
-    updatedEntities.forEach((updatedEntity) => {
-        var index = entities.findIndex(entity => entity.id === updatedEntity.id);
-        if (index === -1) {
-            entities.push(updatedEntity);
-        } else {
-            entities[index] = updatedEntity;
-        }
+    updatedEntities.forEach(updatedEntity => {
+        entities[updatedEntity.id] = updatedEntity;
     });
     state.entities[type].run();
+    //updatedEntities.forEach((updatedEntity) => {
+    //    var index = entities.findIndex(entity => entity.id === updatedEntity.id);
+    //    if (index === -1) {
+    //        entities.push(updatedEntity);
+    //    } else {
+    //        entities[index] = updatedEntity;
+    //    }
+    //});
+    //state.entities[type].run();
 }
