@@ -43,7 +43,7 @@ import {IntlProvider, FormattedMessage} from 'react-intl';
 /**
  * The component.
  */
-export default class extends React.Component {
+export default class Home extends React.Component {
 
     // Expected properties.
     static propTypes = {
@@ -81,7 +81,7 @@ export default class extends React.Component {
     // If you want to integrate with other JavaScript frameworks, set timers using setTimeout or setInterval,
     // or send AJAX requests, perform those operations in this method.
     componentDidMount() {
-        homepage_initialize();
+        homepage_initialize(Home.getQuery());
     }
 
     // Invoked when a component is receiving new props. This method is not called for the initial render.
@@ -122,6 +122,13 @@ export default class extends React.Component {
     // Perform any necessary cleanup in this method,
     // such as invalidating timers or cleaning up any DOM elements that were created in componentDidMount.
     componentWillUnmount() {
+    }
+
+    // Invoked before requesting data for this component.
+    static getQuery(){
+        return `viewer {
+                    ${UserPanel.getQuery()}
+                }`;
     }
 
     // Render the component.

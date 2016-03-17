@@ -58,6 +58,14 @@ export default class PostPanel extends React.Component {
         return React.addons.shallowCompare(this, nextProps, nextState);
     }
 
+    // Invoked before requesting data for this component.
+    static getQuery(){
+        return `title
+                comments (offset: 2, limit: 4) {
+                    content
+                }`;
+    }
+
     // Render the component.
     render() {
         // Get the properties.

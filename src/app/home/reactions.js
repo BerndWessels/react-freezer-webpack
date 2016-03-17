@@ -16,23 +16,27 @@ let exports = {};
 /**
  * Load initial homepage data.
  */
-createReaction(exports, 'homepage:initialize', () => {
+createReaction(exports, 'homepage:initialize', (query) => {
     const state = store.get();
     if (state.app.home.isInitialized) {
         return;
     }
     state.app.home.set('loading', true);
+    /*
     fetch(`viewer {
             firstName
             email
             posts {
                 title
-                comments {
+                comments(offset: 0, limit: 5) {
                     content
                 }
             }
           }`
-    ).then((queryValue) => {
+    )
+     */
+    fetch(query)
+    .then((queryValue) => {
         const state = store.get();
         let home = state.app.home.transact();
         home.loading = false;

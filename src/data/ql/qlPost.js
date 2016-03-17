@@ -12,8 +12,11 @@ export default {
     },
     comments: {
         type: 'Comment',
-        resolve: (dbPost) => {
-            return dbPost.getComments();
+        resolve: (dbPost, {offset, limit}) => {
+            var args = {};
+            if(offset !== undefined) args.offset = offset;
+            if(limit !== undefined) args.limit = limit;
+            return dbPost.getComments(args);
         }
     }
 }

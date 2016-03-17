@@ -59,6 +59,15 @@ export default class UserPanel extends React.Component {
         return React.addons.shallowCompare(this, nextProps, nextState);
     }
 
+    // Invoked before requesting data for this component.
+    static getQuery(){
+        return `firstName
+                email
+                posts {
+                    ${PostPanel.getQuery()}
+                }`;
+    }
+
     // Render the component.
     render() {
         // Get the properties.
