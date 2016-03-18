@@ -3,6 +3,8 @@
  */
 import db from '../db/db';
 
+var connectionCounter = 0;
+
 export default {
     user: {
         type: 'User',
@@ -11,12 +13,16 @@ export default {
         }
     },
     comments: {
-        type: 'Comment',
-        resolve: (dbPost, {offset, limit}) => {
-            var args = {};
-            if(offset !== undefined) args.offset = offset;
-            if(limit !== undefined) args.limit = limit;
-            return dbPost.getComments(args);
+        type: 'CommentConnection',
+        resolve: (dbPost, args) => {
+            let id = args && args.hasOwnProperty('id') && args.id !== undefined ? args.id : ++connectionCounter;
+            let params = {};
+            if (args && args.hasOwnProperty('ids') && args.ids !== undefined) params.where = {id: {in: args.ids}};
+            if (args && args.hasOwnProperty('offset') && args.offset !== undefined) params.offset = args.offset;
+            if (args && args.hasOwnProperty('limit') && args.limit !== undefined) params.limit = args.limit;
+            return dbPost.getComments(params).then(dbComments => {
+                return {id: id, nodes: dbComments};
+            });
         }
     }
 }

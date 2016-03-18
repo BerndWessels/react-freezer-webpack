@@ -6,7 +6,7 @@ export default {
   },
   "User": {
     "posts": {
-      "type": "Post"
+      "type": "PostConnection"
     }
   },
   "Post": {
@@ -14,12 +14,22 @@ export default {
       "type": "User"
     },
     "comments": {
-      "type": "Comment"
+      "type": "CommentConnection"
+    }
+  },
+  "PostConnection": {
+    "nodes": {
+      "type": "Post"
     }
   },
   "Comment": {
     "post": {
       "type": "Post"
+    }
+  },
+  "CommentConnection": {
+    "nodes": {
+      "type": "Comment"
     }
   }
 }

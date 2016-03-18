@@ -8,7 +8,9 @@ import db from '../db/db';
  */
 import User from './qlUser';
 import Post from './qlPost';
+import PostConnection from './qlPostConnection';
 import Comment from './qlComment';
+import CommentConnection from './qlCommentConnection';
 
 export default {
     Query: {
@@ -21,5 +23,7 @@ export default {
     },
     User: User,
     Post: Post,
-    Comment: Comment
+    PostConnection: PostConnection,
+    Comment: Comment,
+    CommentConnection: CommentConnection
 }

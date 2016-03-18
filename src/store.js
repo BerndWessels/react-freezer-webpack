@@ -9,14 +9,17 @@
 
 import Freezer from 'freezer-js';
 import app from './app/store';
+import schema from './data/ql/qlClientSchema';
 
 const store = new Freezer({
     locale: 'en',
     app: app,
     // Entity cache is not pluralized to better reflect types.
     entities: {
+        // TODO entities type caches get created if they don't exist. maybe no need to create them here?
         User: {},
         Post: {},
+        PostConnection: {},
         Comment: {}
     }
 }, {
@@ -27,7 +30,7 @@ export default store;
 
 export function createReaction(exports, name, handler, trigger) {
     store.on(name, handler);
-    exports[name.replace(':', '_')] = trigger ? trigger : (...args) => {
+    exports[name.replace(/:/g, '_')] = trigger ? trigger : (...args) => {
         store.trigger(name, ...args);
     };
 }
@@ -38,6 +41,9 @@ export function getEntity(type, id) {
 }
 
 export function getEntities(type, ids) {
+    if(!Array.isArray(ids)){
+        return [];
+    }
     const state = store.get();
     var entities = [];
     ids.forEach(id => {
@@ -46,9 +52,21 @@ export function getEntities(type, ids) {
         }
     });
     return entities;
-    //return state.entities[type].filter(entity => {
-    //    return ids.findIndex(id => id == entity.id) !== -1;
-    //});
+}
+
+export function getEntitiesFromConnection(connectionType, connectionId) {
+    if(!connectionId){
+        return [];
+    }
+    var entities = [];
+    var nodeType = schema[connectionType].nodes.type;
+    const state = store.get();
+    state.entities[connectionType][connectionId].nodes.forEach((nodeId) => {
+        if (state.entities[nodeType].hasOwnProperty(nodeId)) {
+            entities.push(state.entities[nodeType][nodeId]);
+        }
+    });
+    return entities;
 }
 
 export function setEntity(type, updatedEntity) {
@@ -56,12 +74,6 @@ export function setEntity(type, updatedEntity) {
     let entities = state.entities[type].transact();
     entities[updatedEntity.id] = updatedEntity;
     state.entities[type].run();
-    //var index = state.entities[type].findIndex(entity => entity.id === updatedEntity.id);
-    //if (index === -1) {
-    //    state.entities[type].push(updatedEntity);
-    //} else {
-    //    state.entities[type].set(index, updatedEntity);
-    //}
 }
 
 export function setEntities(type, updatedEntities) {
@@ -71,13 +83,4 @@ export function setEntities(type, updatedEntities) {
         entities[updatedEntity.id] = updatedEntity;
     });
     state.entities[type].run();
-    //updatedEntities.forEach((updatedEntity) => {
-    //    var index = entities.findIndex(entity => entity.id === updatedEntity.id);
-    //    if (index === -1) {
-    //        entities.push(updatedEntity);
-    //    } else {
-    //        entities[index] = updatedEntity;
-    //    }
-    //});
-    //state.entities[type].run();
 }

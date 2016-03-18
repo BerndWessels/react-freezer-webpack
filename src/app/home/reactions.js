@@ -11,38 +11,46 @@ import {default as store, createReaction, setEntity, setEntities} from '../../st
 
 import fetch from '../../ql/lib/fetch';
 
+import Home from './home';
+import PostPanel from '../../components/postPanel/postPanel';
+
 let exports = {};
 
 /**
  * Load initial homepage data.
  */
-createReaction(exports, 'homepage:initialize', (query) => {
+createReaction(exports, 'homepage:initialize', () => {
     const state = store.get();
     if (state.app.home.isInitialized) {
         return;
     }
     state.app.home.set('loading', true);
-    /*
-    fetch(`viewer {
-            firstName
-            email
-            posts {
-                title
-                comments(offset: 0, limit: 5) {
-                    content
-                }
-            }
-          }`
-    )
-     */
-    fetch(query)
-    .then((queryValue) => {
+    fetch(Home.getQuery()).then((queryValue) => {
         const state = store.get();
         let home = state.app.home.transact();
         home.loading = false;
         home.isInitialized = true;
         home.viewer = queryValue.viewer;
         state.app.home.run();
+    });
+});
+
+/**
+ * Load initial homepage data.
+ */
+createReaction(exports, 'comments:limit:update', (post, limit) => {
+    if (isNaN(parseInt(limit, 10)))
+        return;
+    console.log(post.comments);
+    fetch(`viewer {
+               posts(ids: [${post.id}]) {
+                   nodes {
+                       ${PostPanel.getQuery(post.comments, undefined, limit)}
+                   }
+               }
+           }`, true
+    ).then((queryValue) => {
+        console.log(store.get().entities);
     });
 });
 

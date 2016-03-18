@@ -19,7 +19,7 @@ import {getEntity} from '../../store';
 /**
  * Import Reactions.
  */
-import {homepage_initialize, something_update, user_update} from './reactions';
+import {homepage_initialize, something_update, user_update, comments_limit_update} from './reactions';
 
 /**
  * Import Components.
@@ -81,7 +81,7 @@ export default class Home extends React.Component {
     // If you want to integrate with other JavaScript frameworks, set timers using setTimeout or setInterval,
     // or send AJAX requests, perform those operations in this method.
     componentDidMount() {
-        homepage_initialize(Home.getQuery());
+        homepage_initialize();
     }
 
     // Invoked when a component is receiving new props. This method is not called for the initial render.
@@ -125,7 +125,7 @@ export default class Home extends React.Component {
     }
 
     // Invoked before requesting data for this component.
-    static getQuery(){
+    static getQuery() {
         return `viewer {
                     ${UserPanel.getQuery()}
                 }`;
@@ -151,7 +151,8 @@ export default class Home extends React.Component {
                         if (viewer) {
                             return (
                                 <li>
-                                    <UserPanel user={viewer} handleUserUpdate={user_update}/>
+                                    <UserPanel user={viewer} handleUserUpdate={user_update}
+                                               comments_limit_update={comments_limit_update}/>
                                 </li>
                             );
                         }

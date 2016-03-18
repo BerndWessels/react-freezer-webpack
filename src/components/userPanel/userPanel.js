@@ -12,7 +12,7 @@ import React from 'react';
 /**
  * Import Entities.
  */
-import {getEntities} from '../../store';
+import {getEntities, getEntitiesFromConnection} from '../../store';
 
 /**
  * Import Components.
@@ -60,20 +60,22 @@ export default class UserPanel extends React.Component {
     }
 
     // Invoked before requesting data for this component.
-    static getQuery(){
+    static getQuery() {
         return `firstName
                 email
                 posts {
-                    ${PostPanel.getQuery()}
+                    nodes {
+                        ${PostPanel.getQuery()}
+                    }
                 }`;
     }
 
     // Render the component.
     render() {
         // Get the properties.
-        const {user, handleUserUpdate} = this.props;
+        const {user, handleUserUpdate, comments_limit_update} = this.props;
         // Get the posts.
-        var posts = getEntities('Post', user.posts);
+        var posts = getEntitiesFromConnection('PostConnection', user.posts);
         // Calculate the styles.
         let className = style.root;
         // Return the component UI.
@@ -85,7 +87,7 @@ export default class UserPanel extends React.Component {
                     {posts.map(post => {
                         return (
                             <li key={post.id}>
-                                <PostPanel post={post}/>
+                                <PostPanel post={post} comments_limit_update={comments_limit_update}/>
                             </li>
                         );
                     })}

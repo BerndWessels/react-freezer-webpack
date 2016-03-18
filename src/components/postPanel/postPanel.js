@@ -12,7 +12,7 @@ import React from 'react';
 /**
  * Import Entities.
  */
-import {getEntities} from '../../store';
+import {getEntities, getEntitiesFromConnection} from '../../store';
 
 /**
  * Import Components.
@@ -59,25 +59,28 @@ export default class PostPanel extends React.Component {
     }
 
     // Invoked before requesting data for this component.
-    static getQuery(){
+    static getQuery(id, offset = 0, limit = 5) {
         return `title
-                comments (offset: 2, limit: 4) {
-                    content
+                comments (${id !== undefined ? 'id:' + id + ', ' : ""}offset: ${offset}, limit: ${limit}) {
+                    nodes {
+                        ${CommentPanel.getQuery()}
+                    }
                 }`;
     }
 
     // Render the component.
     render() {
         // Get the properties.
-        const {post} = this.props;
+        const {post, comments_limit_update} = this.props;
         // Get the comments.
-        var comments = getEntities('Comment', post.comments);
+        var comments = getEntitiesFromConnection('CommentConnection', post.comments);
         // Calculate the styles.
         let className = style.root;
         // Return the component UI.
         return (
             <div className={className}>
                 <div>{post.title}</div>
+                <input type="text" defaultValue={0} onChange={(e) => comments_limit_update(post, e.target.value)}/>
                 <ul>
                     {comments.map(comment => {
                         return (

@@ -37,10 +37,14 @@ function queryNode(schema, node, nodeType, nodeData) {
             if (propType && propType.type) {
                 let propNode = node.props[propName];
                 if (Array.isArray(propData)) {
-                    propData.forEach((propDataItem) => {
-                        nodePromisesMeta.push({propName, isArray: true});
-                        nodePromises.push(queryNode(schema, propNode, schema[propType.type], propDataItem));
-                    });
+                    if (propData.length === 0) {
+                        result[propName] = [];
+                    } else {
+                        propData.forEach((propDataItem) => {
+                            nodePromisesMeta.push({propName, isArray: true});
+                            nodePromises.push(queryNode(schema, propNode, schema[propType.type], propDataItem));
+                        });
+                    }
                 } else {
                     nodePromisesMeta.push({propName});
                     nodePromises.push(queryNode(schema, propNode, schema[propType.type], propData));
@@ -114,6 +118,9 @@ function processQueryResultNode(schema, entities, node, nodeType, entityType) {
         }
     }
     if (entityType) {
+        if (!entities.hasOwnProperty(entityType)) {
+            entities[entityType] = {};
+        }
         entities[entityType][node.id] = node; //_.omit(node, 'id');
         return node.id;
     } else {

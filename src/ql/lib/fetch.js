@@ -2,7 +2,7 @@ import {default as store, createReaction, setEntity, setEntities} from '../../st
 import {processQueryResult} from './processor';
 import schema from '../../data/ql/qlClientSchema';
 
-export default function (query) {
+export default function (query, update) {
     return fetch('http://127.0.0.1:8088', {
         method: 'POST',
         headers: {
@@ -16,28 +16,11 @@ export default function (query) {
         })
     }).then(response => {
         return response.json().then(result => {
-            //console.log(result);
             let state = store.get();
             let entities = state.entities.transact();
-            //{
-            //    User: state.entities.User.transact(),
-            //    Post: state.entities.User.transact(),
-            //    Comment: state.entities.User.transact()
-            //};
-            //let users = state.entities.User.transact();
-            //users[5] = {a: 1};
-            //entities['User'][1] = {a: 1};
-            // The result of the query will be the root object of that query.
-             let queryValue = processQueryResult(schema, entities, result);
-            // The result of the query will update the client's entity cache.
-            //console.log(JSON.stringify(entities, null, 2));
-            //
+            let queryValue = processQueryResult(schema, entities, result);
+            console.log(entities);
             state.entities.run();
-            //state.entities.User.run();
-            //state.entities.Post.run();
-            //state.entities.Comment.run();
-            //state = store.get();
-            //console.log(state.entities);
             return queryValue;
         });
     });
