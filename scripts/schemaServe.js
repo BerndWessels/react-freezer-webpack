@@ -35,12 +35,12 @@ export default task('serve data', async () => {
     });
     // Expose the GraphQL endpoint.
     server.use((req, res, next) => {
-        console.log(JSON.stringify(req.headers, null, 2));
-        console.log(req.body.query.trim());
+        //console.log(JSON.stringify(req.headers, null, 2));
+        //console.log(req.body.query.trim());
         let jsonQuery = parse(req.body.query.trim());
-        console.log(JSON.stringify(jsonQuery, null, 2));
+        //console.log(JSON.stringify(jsonQuery, null, 2));
         executeQuery(schema, jsonQuery).then((result)=> {
-            console.log(result);
+            //console.log(result);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(result));
         });

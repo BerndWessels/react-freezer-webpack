@@ -38,19 +38,25 @@ createReaction(exports, 'homepage:initialize', () => {
 /**
  * Load initial homepage data.
  */
-createReaction(exports, 'comments:limit:update', (post, limit) => {
+createReaction(exports, 'comments:limit:update', (postsId, post, limit) => {
     if (isNaN(parseInt(limit, 10)))
         return;
-    console.log(post.comments);
     fetch(`viewer {
-               posts(ids: [${post.id}]) {
+               posts(id: ${postsId}, ids: [${post.id}]) {
                    nodes {
                        ${PostPanel.getQuery(post.comments, undefined, limit)}
                    }
                }
-           }`, true
+           }`,
+        (entities, entityType, node) => {
+            // Do not update the PostConnection since we only want to
+            // update one of its Posts rather than replacing all Posts.
+            if (entityType === 'PostConnection' && node.id === postsId) {
+                return true;
+            }
+        }
     ).then((queryValue) => {
-        console.log(store.get().entities);
+        console.log(queryValue, store.get().entities);
     });
 });
 

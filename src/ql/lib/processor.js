@@ -97,11 +97,11 @@ function queryNode(schema, node, nodeType, nodeData) {
 }
 
 
-function processQueryResult(schema, entities, jsonQueryResult) {
-    return processQueryResultNode(schema, entities, jsonQueryResult, schema.Query, null);
+function processQueryResult(schema, entities, jsonQueryResult, mergeCallback) {
+    return processQueryResultNode(schema, entities, jsonQueryResult, schema.Query, null, mergeCallback);
 }
 
-function processQueryResultNode(schema, entities, node, nodeType, entityType) {
+function processQueryResultNode(schema, entities, node, nodeType, entityType, mergeCallback) {
     for (let propName in node) {
         let prop = node[propName];
         let propType = nodeType[propName];
@@ -109,11 +109,11 @@ function processQueryResultNode(schema, entities, node, nodeType, entityType) {
             if (Array.isArray(prop)) {
                 let propItemIds = [];
                 prop.forEach((propItem) => {
-                    propItemIds.push(processQueryResultNode(schema, entities, propItem, schema[propType.type], propType.type));
+                    propItemIds.push(processQueryResultNode(schema, entities, propItem, schema[propType.type], propType.type, mergeCallback));
                 });
                 node[propName] = propItemIds;
             } else {
-                node[propName] = processQueryResultNode(schema, entities, prop, schema[propType.type], propType.type);
+                node[propName] = processQueryResultNode(schema, entities, prop, schema[propType.type], propType.type, mergeCallback);
             }
         }
     }
@@ -121,7 +121,11 @@ function processQueryResultNode(schema, entities, node, nodeType, entityType) {
         if (!entities.hasOwnProperty(entityType)) {
             entities[entityType] = {};
         }
-        entities[entityType][node.id] = node; //_.omit(node, 'id');
+        if (mergeCallback && mergeCallback(entities, entityType, node) !== undefined) {
+            return node.id;
+        }
+        entities[entityType][node.id] =
+            entities[entityType].hasOwnProperty(node.id) ? Object.assign({}, entities[entityType][node.id], node) : node;
         return node.id;
     } else {
         return node;

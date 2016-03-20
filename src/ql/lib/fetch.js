@@ -2,7 +2,7 @@ import {default as store, createReaction, setEntity, setEntities} from '../../st
 import {processQueryResult} from './processor';
 import schema from '../../data/ql/qlClientSchema';
 
-export default function (query, update) {
+export default function (query, mergeCallback) {
     return fetch('http://127.0.0.1:8088', {
         method: 'POST',
         headers: {
@@ -18,8 +18,7 @@ export default function (query, update) {
         return response.json().then(result => {
             let state = store.get();
             let entities = state.entities.transact();
-            let queryValue = processQueryResult(schema, entities, result);
-            console.log(entities);
+            let queryValue = processQueryResult(schema, entities, result, mergeCallback);
             state.entities.run();
             return queryValue;
         });

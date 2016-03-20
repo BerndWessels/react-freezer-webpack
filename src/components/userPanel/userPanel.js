@@ -87,7 +87,8 @@ export default class UserPanel extends React.Component {
                     {posts.map(post => {
                         return (
                             <li key={post.id}>
-                                <PostPanel post={post} comments_limit_update={comments_limit_update}/>
+                                <PostPanel post={post}
+                                           comments_limit_update={limit => comments_limit_update(user.posts, post, limit)}/>
                             </li>
                         );
                     })}

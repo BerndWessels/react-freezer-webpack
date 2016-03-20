@@ -80,7 +80,7 @@ export default class PostPanel extends React.Component {
         return (
             <div className={className}>
                 <div>{post.title}</div>
-                <input type="text" defaultValue={0} onChange={(e) => comments_limit_update(post, e.target.value)}/>
+                <input type="text" defaultValue={0} onChange={(e) => comments_limit_update(e.target.value)}/>
                 <ul>
                     {comments.map(comment => {
                         return (

@@ -62,7 +62,8 @@ module.exports = {
             b = '';
         } while (i < q.length);
 
-        console.log(JSON.stringify(rootNode, null, 2));
+        // console.log(JSON.stringify(rootNode, null, 2));
+        
         /*
         q.match(/\s*(.*)[\s{]/g).forEach((_node, _nodeIndex)=> {
             _node = _node.trim();
