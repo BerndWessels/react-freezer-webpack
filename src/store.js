@@ -41,7 +41,7 @@ export function getEntity(type, id) {
 }
 
 export function getEntities(type, ids) {
-    if(!Array.isArray(ids)){
+    if (!Array.isArray(ids)) {
         return [];
     }
     const state = store.get();
@@ -55,7 +55,7 @@ export function getEntities(type, ids) {
 }
 
 export function getEntitiesFromConnection(connectionType, connectionId) {
-    if(!connectionId){
+    if (!connectionId) {
         return [];
     }
     var entities = [];
@@ -67,6 +67,21 @@ export function getEntitiesFromConnection(connectionType, connectionId) {
         }
     });
     return entities;
+}
+
+export function getConnectionWithEntities(connectionType, connectionId) {
+    if (!connectionId) {
+        return [];
+    }
+    var entities = [];
+    var nodeType = schema[connectionType].nodes.type;
+    const state = store.get();
+    state.entities[connectionType][connectionId].nodes.forEach((nodeId) => {
+        if (state.entities[nodeType].hasOwnProperty(nodeId)) {
+            entities.push(state.entities[nodeType][nodeId]);
+        }
+    });
+    return {...state.entities[connectionType][connectionId], nodes: entities};
 }
 
 export function setEntity(type, updatedEntity) {
