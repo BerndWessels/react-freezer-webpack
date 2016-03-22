@@ -7,13 +7,13 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import {default as store, createReaction, setEntity, setEntities} from '../../store';
-
-import fetch from '../../ql/lib/fetch';
-
+import {default as store, createReaction, setEntity, fetchQuery} from '../../store';
 import Home from './home';
 import PostPanel from '../../components/postPanel/postPanel';
 
+/**
+ * Export all reactions.
+ */
 let exports = {};
 
 /**
@@ -25,7 +25,7 @@ createReaction(exports, 'homepage:initialize', () => {
         return;
     }
     state.app.home.set('loading', true);
-    fetch(Home.getQuery()).then((queryValue) => {
+    fetchQuery(Home.getQuery()).then((queryValue) => {
         const state = store.get();
         let home = state.app.home.transact();
         home.loading = false;
@@ -36,15 +36,15 @@ createReaction(exports, 'homepage:initialize', () => {
 });
 
 /**
- * Load initial homepage data.
+ * Update the range of comments to display for the given post.
  */
-createReaction(exports, 'comments:limit:update', (postsId, post, limit) => {
-    if (isNaN(parseInt(limit, 10)))
+createReaction(exports, 'comments:range:update', (postsId, post, offset, limit) => {
+    if (isNaN(parseInt(offset, 10)) || isNaN(parseInt(limit, 10)))
         return;
-    fetch(`viewer {
+    fetchQuery(`viewer {
                posts(id: ${postsId}, ids: [${post.id}]) {
                    nodes {
-                       ${PostPanel.getQuery(post.comments, undefined, limit)}
+                       ${PostPanel.getQuery(post.comments, offset, limit)}
                    }
                }
            }`,
@@ -56,7 +56,7 @@ createReaction(exports, 'comments:limit:update', (postsId, post, limit) => {
             }
         }
     ).then((queryValue) => {
-        console.log(queryValue, store.get().entities);
+        //console.log(queryValue, store.get().entities);
     });
 });
 
@@ -78,4 +78,7 @@ createReaction(exports, 'user:update', (updatedUser) => {
     setEntity('User', updatedUser);
 });
 
+/**
+ * Export all reactions.
+ */
 module.exports = exports;

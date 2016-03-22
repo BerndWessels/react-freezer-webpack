@@ -136,7 +136,7 @@ module.exports = function makeWebpackConfig(options) {
      * This handles most of the magic responsible for converting modules
      */
 
-        // Initialize module
+    // Initialize module
     config.module = {
         preLoaders: [],
         loaders: [{

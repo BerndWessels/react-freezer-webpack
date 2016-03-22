@@ -73,7 +73,7 @@ export default class UserPanel extends React.Component {
     // Render the component.
     render() {
         // Get the properties.
-        const {user, handleUserUpdate, comments_limit_update} = this.props;
+        const {user, handleUserUpdate, comments_range_update} = this.props;
         // Get the posts.
         var posts = getEntitiesFromConnection('PostConnection', user.posts);
         // Calculate the styles.
@@ -88,7 +88,7 @@ export default class UserPanel extends React.Component {
                         return (
                             <li key={post.id}>
                                 <PostPanel post={post}
-                                           comments_limit_update={limit => comments_limit_update(user.posts, post, limit)}/>
+                                           comments_range_update={(offset, limit) => comments_range_update(user.posts, post, offset, limit)}/>
                             </li>
                         );
                     })}

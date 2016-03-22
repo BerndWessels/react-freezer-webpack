@@ -1,5 +1,17 @@
-const q = require('q');
+/**
+ * Manapaho (https://github.com/manapaho/)
+ *
+ * Copyright © 2016 Manapaho. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
 
+import q from 'q';
+
+/**
+ * The database that the schema will access.
+ */
 const dbUser = {
     id: 0,
     email: 'bernd@wessels.de',
@@ -50,7 +62,10 @@ const dbUser = {
     }
 };
 
-module.exports = {
+/**
+ * The query language schema.
+ */
+export default {
     schema: {
         Query: {
             viewer: {

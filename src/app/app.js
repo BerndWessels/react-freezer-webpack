@@ -135,6 +135,7 @@ export default class extends React.Component {
         return (
             <div className={className}>
                 <Link to="/">Home</Link>
+                <br/>
                 <Link to="/settings">Settings</Link>
                 <div onClick={() => locale_toggle('A debug message!', true)}>
                     <FormattedMessage id="app.button"

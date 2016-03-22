@@ -74,7 +74,7 @@ export default class PostPanel extends React.Component {
     // Render the component.
     render() {
         // Get the properties.
-        const {post, comments_limit_update} = this.props;
+        const {post, comments_range_update} = this.props;
         // Get the comments.
         var commentsConnection = getConnectionWithEntities('CommentConnection', post.comments);
         // Calculate the styles.
@@ -83,7 +83,12 @@ export default class PostPanel extends React.Component {
         return (
             <div className={className}>
                 <div>{post.title}</div>
-                <input type="text" defaultValue={commentsConnection.limit} onChange={(e) => comments_limit_update(e.target.value)}/>
+                <label>Offset:</label>
+                <input type="text" defaultValue={commentsConnection.offset} onChange={(e) => comments_range_update(e.target.value, commentsConnection.limit)}/>
+                <label>Limit:</label>
+                <input type="text" defaultValue={commentsConnection.limit} onChange={(e) => comments_range_update(commentsConnection.offset, e.target.value)}/>
+                <label>Total:</label>
+                <span>{commentsConnection.total}</span>
                 <ul>
                     {commentsConnection.nodes.map(comment => {
                         return (

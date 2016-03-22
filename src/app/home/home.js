@@ -19,7 +19,7 @@ import {getEntity} from '../../store';
 /**
  * Import Reactions.
  */
-import {homepage_initialize, something_update, user_update, comments_limit_update} from './reactions';
+import {homepage_initialize, something_update, user_update, comments_range_update} from './reactions';
 
 /**
  * Import Components.
@@ -152,7 +152,7 @@ export default class Home extends React.Component {
                             return (
                                 <li>
                                     <UserPanel user={viewer} handleUserUpdate={user_update}
-                                               comments_limit_update={comments_limit_update}/>
+                                               comments_range_update={comments_range_update}/>
                                 </li>
                             );
                         }

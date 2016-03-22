@@ -34,9 +34,10 @@ export default function (sequelize, DataTypes) {
                 allowNull: false
             }
         },
-        // Declare the associations.
         {
+            // Prevent automatic table naming.
             freezeTableName: true,
+            // Declare the associations.
             classMethods: {
                 associate: function (models) {
                     model.hasMany(models.Post);

@@ -19,7 +19,7 @@ import path from 'path';
 import Sequelize from 'sequelize';
 
 /**
- * Create the database connection.
+ * Create the database connection. TODO get details from a config file.
  */
 var sequelize = new Sequelize('manapaho', 'root', 'abcDEF123', {
     host: '192.168.101.58',
@@ -67,6 +67,12 @@ export default db;
  */
 var connectionCounter = 0;
 
+/**
+ * This helper is used to retrieve a connection from a given entity.
+ * @param dbEntity Must be a sequelize model instance.
+ * @param getter Must be the getter function name (e.g. 'getComments')
+ * @param args An object with none or any of these properties {id, ids, offset, limit}
+ */
 export function getConnection(dbEntity, getter, args) {
     let params = {};
     if (args && args.ids !== undefined) params.where = {id: {in: args.ids}};
@@ -83,6 +89,12 @@ export function getConnection(dbEntity, getter, args) {
     });
 }
 
+/**
+ * This helper is used to retrieve a connection for a given entity including the total.
+ * @param where Must be the entities id in form of a where clause (e.g. {postId: dbPost.id}).
+ * @param model Must be the model name of the entities to retrieve (e.g. 'Comment').
+ * @param args An object with none or any of these properties {id, ids, offset, limit}
+ */
 export function getConnectionWithTotal(where, model, args) {
     var params = {
         where: where
@@ -90,22 +102,14 @@ export function getConnectionWithTotal(where, model, args) {
     if (args && args.ids !== undefined) Object.assign(params.where, {id: {in: args.ids}});
     if (args && args.offset !== undefined) params.offset = args.offset;
     if (args && args.limit !== undefined) params.limit = args.limit;
-
-    try {
-
-        return db.Comment.findAndCountAll(params).then(result => {
-            return {
-                id: args && args.id !== undefined ? args.id : ++connectionCounter,
-                ids: args && args.ids !== undefined ? args.ids : [],
-                nodes: result.rows,
-                offset: params.offset ? params.offset : 0,
-                limit: params.limit ? params.limit : 0,
-                total: result.count
-            };
-        });
-
-    }
-    catch(x) {
-        console.log(x);
-    }
+    return db[model].findAndCountAll(params).then(result => {
+        return {
+            id: args && args.id !== undefined ? args.id : ++connectionCounter,
+            ids: args && args.ids !== undefined ? args.ids : [],
+            nodes: result.rows,
+            offset: params.offset ? params.offset : 0,
+            limit: params.limit ? params.limit : 0,
+            total: result.count
+        };
+    });
 }

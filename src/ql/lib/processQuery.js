@@ -1,9 +1,20 @@
-"use strict";
+/**
+ * Manapaho (https://github.com/manapaho/)
+ *
+ * Copyright © 2016 Manapaho. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
 
-const q = require('q');
-const _ = require('lodash');
+import q from 'q';
 
-function executeQuery(schema, jsonQuery) {
+/**
+ * This will execute a given JSON query tree on the given schema.
+ * @param schema A query language schema.
+ * @param jsonQuery A JSON query tree.
+ */
+export default function (schema, jsonQuery) {
     return queryNode(schema, jsonQuery, schema.Query, null);
 }
 
@@ -94,45 +105,4 @@ function queryNode(schema, node, nodeType, nodeData) {
                 return result;
             });
         });
-}
-
-
-function processQueryResult(schema, entities, jsonQueryResult, mergeCallback) {
-    return processQueryResultNode(schema, entities, jsonQueryResult, schema.Query, null, mergeCallback);
-}
-
-function processQueryResultNode(schema, entities, node, nodeType, entityType, mergeCallback) {
-    for (let propName in node) {
-        let prop = node[propName];
-        let propType = nodeType[propName];
-        if (propType && propType.type && prop !== null) {
-            if (Array.isArray(prop)) {
-                let propItemIds = [];
-                prop.forEach((propItem) => {
-                    propItemIds.push(processQueryResultNode(schema, entities, propItem, schema[propType.type], propType.type, mergeCallback));
-                });
-                node[propName] = propItemIds;
-            } else {
-                node[propName] = processQueryResultNode(schema, entities, prop, schema[propType.type], propType.type, mergeCallback);
-            }
-        }
-    }
-    if (entityType) {
-        if (!entities.hasOwnProperty(entityType)) {
-            entities[entityType] = {};
-        }
-        if (mergeCallback && mergeCallback(entities, entityType, node) !== undefined) {
-            return node.id;
-        }
-        entities[entityType][node.id] =
-            entities[entityType].hasOwnProperty(node.id) ? Object.assign({}, entities[entityType][node.id], node) : node;
-        return node.id;
-    } else {
-        return node;
-    }
-}
-
-module.exports = {
-    executeQuery: executeQuery,
-    processQueryResult: processQueryResult
 }

@@ -11,8 +11,8 @@ import cors from 'cors';
 import express from'express';
 import bodyParser from 'body-parser';
 import task from './lib/task';
-import {parse} from'../src/ql/lib/parser';
-import {executeQuery} from '../src/ql/lib/processor';
+import parseQuery from'../src/ql/lib/parseQuery';
+import processQuery from '../src/ql/lib/processQuery';
 import schema from '../src/data/ql/qlSchema';
 
 /**
@@ -37,9 +37,9 @@ export default task('serve data', async () => {
     server.use((req, res, next) => {
         //console.log(JSON.stringify(req.headers, null, 2));
         //console.log(req.body.query.trim());
-        let jsonQuery = parse(req.body.query.trim());
+        let jsonQuery = parseQuery(req.body.query.trim());
         //console.log(JSON.stringify(jsonQuery, null, 2));
-        executeQuery(schema, jsonQuery).then((result)=> {
+        processQuery(schema, jsonQuery).then((result)=> {
             //console.log(result);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(result));

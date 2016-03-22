@@ -22,5 +22,5 @@ export default task('update schema', async () => {
         }
     }
     var output = `export default ${JSON.stringify(clientSchema, null, 2)}`;
-    fs.writeFile(path.join(__dirname, '../src/data/ql/qlClientSchema.js'), output);
+    fs.writeFile(path.join(__dirname, '../src/data/ql/qlSchema.client.js'), output);
 });

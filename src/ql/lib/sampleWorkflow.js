@@ -1,9 +1,16 @@
-"use strict";
+/**
+ * Manapaho (https://github.com/manapaho/)
+ *
+ * Copyright © 2016 Manapaho. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
 
-const parser = require('./parser');
-const executeQuery = require('./processor').executeQuery;
-const processQueryResult = require('./processor').processQueryResult;
-const sampleSchema = require('./sampleSchema');
+import parseQuery from './parseQuery';
+import processQuery from './processQuery';
+import processQueryResult from './processQueryResult';
+import sampleSchema from './sampleSchema';
 
 // Client sends this to the server.
 
@@ -13,7 +20,7 @@ var qlQuery = `
         email
         tickets {
             title
-            owner(limit: 5, offset: 'none') {
+            owner(limit: 5, offset: "none") {
                 email
                 report {
                     overallStatus
@@ -26,25 +33,21 @@ var qlQuery = `
         report {
             overallStatus
         }
-    }
-`;
+    }`;
 
 // Server parses it.
 
-let jsonQuery = parser.parse(qlQuery);
+let jsonQuery = parseQuery(qlQuery);
 
 // Server processes it.
-executeQuery(sampleSchema.schema, jsonQuery).then((result)=> {
+processQuery(sampleSchema.schema, jsonQuery).then((result)=> {
 
     // Server sends result back to the client.
     // ===>
     // Client processes the result.
 
-    let entities = {
-        User: {},
-        Ticket: {},
-        Report: {}
-    };
+    // The client's entity cache.
+    let entities = {};
 
     // The result of the query will be the root object of that query.
     console.log(processQueryResult(sampleSchema.schema, entities, result));
