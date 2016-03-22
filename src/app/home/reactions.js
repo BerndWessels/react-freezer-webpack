@@ -47,7 +47,7 @@ createReaction(exports, 'comments:range:update', (postsId, post, offset, limit) 
                        ${PostPanel.getQuery(post.comments, offset, limit)}
                    }
                }
-           }`,
+           }`, null,
         (entities, entityType, node) => {
             // Do not update the PostConnection since we only want to
             // update one of its Posts rather than replacing all Posts.
@@ -76,6 +76,20 @@ createReaction(exports, 'something:update', (value) => {
 createReaction(exports, 'user:update', (updatedUser) => {
     // TODO maybe add validation here or in the trigger?
     setEntity('User', updatedUser);
+});
+
+/**
+ * Save a user.
+ */
+createReaction(exports, 'user:save', (updatedUser) => {
+    fetchQuery(`viewer {
+                    firstName
+                }`, {
+        id: 'updateUser',
+        user: updatedUser
+    }).then((queryValue) => {
+        //console.log(queryValue, store.get().entities);
+    });
 });
 
 /**

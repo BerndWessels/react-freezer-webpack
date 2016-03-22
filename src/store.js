@@ -146,7 +146,7 @@ export function createReaction(exports, name, handler, trigger) {
  * @param query The query language query string.
  * @param mergeCallback An optional callback to control the way the results are merged back into the entity cache.
  */
-export function fetchQuery(query, mergeCallback) {
+export function fetchQuery(query, command, mergeCallback) {
     // TODO get endpoint and headers from a config.
     return fetch('http://127.0.0.1:8088', {
         method: 'POST',
@@ -156,7 +156,8 @@ export function fetchQuery(query, mergeCallback) {
             "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify({
-            query: query
+            query: query,
+            command: command ? command : null
         })
     }).then(response => {
         return response.json().then(result => {

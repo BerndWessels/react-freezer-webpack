@@ -73,7 +73,7 @@ export default class UserPanel extends React.Component {
     // Render the component.
     render() {
         // Get the properties.
-        const {user, handleUserUpdate, comments_range_update} = this.props;
+        const {user, handleUserUpdate, handleUserSave, comments_range_update} = this.props;
         // Get the posts.
         var posts = getEntitiesFromConnection('PostConnection', user.posts);
         // Calculate the styles.
@@ -83,6 +83,7 @@ export default class UserPanel extends React.Component {
             <div className={className}>
                 <input type="text" value={user.firstName}
                        onChange={(e) => handleUserUpdate(Object.assign({}, user, {firstName: e.target.value}))}/>
+                <input type="button" value="Save" onClick={(e) => handleUserSave(user)}/>
                 <ul>
                     {posts.map(post => {
                         return (

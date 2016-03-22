@@ -1,6 +1,6 @@
 {
   "name": "react-freezer-fullstack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "This is an example on how to use react with freezer and webpack.",
   "main": "src/index.js",
   "scripts": {

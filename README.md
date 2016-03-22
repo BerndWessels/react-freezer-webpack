@@ -1,6 +1,6 @@
 # React / Freezer / Simplified GraphQL / Webpack
 
-# Current Version 0.1.0
+# Current Version 0.1.1
 
 # Overview
 
@@ -11,7 +11,7 @@ It also shows how to integrate access to databases like mysql or postgres with s
 We are using React-Intl V2 as our translation framework. It seems to be the best and most thought after project out there at the moment.
 Even though it is still a pre-release it seems stable enough to be used already.
 
-Another nice feature is the use of CSS modules. It removes all the trouble that usually comes with naming conflicts.
+Another nice feature is the use of CSS modules. It removes all the trouble that usually comes with css naming conflicts.
 
 To make AJAX calls we use fetch, which is available natively on modern browsers and polyfilled via webpack for old browsers.
 
@@ -22,6 +22,9 @@ And we will keep on adding other important SPA related components and processes 
 This project uses Simplified GraphQL which is similar to Relay with GraphQL - but much much simpler and easier to use.
 
 It also integrates fantastically with Freezer. And because it is so much simpler it gives you much more flexibility and freedom to adjust it to your needs.
+
+For example, instead of having the highly complicated and very restricted Relay/GraphQL Mutations, we can just send simple JSON commands with Simplified GraphQL queries.
+This Project shows how powerful and flexible this is.
 
 # Why not Relay and GraphQL
 
@@ -47,6 +50,7 @@ Add a changelog to make it easier for followers to find relevant changes.
 * SASS
 * Sequelize MySQL/MSSQL/Postgres
 * Webpack
+* Browser Sync
 * React Bootstrap
 * React-Intl V2 Internationalization
 * Heavily commented webpack configuration with reasonable defaults.
