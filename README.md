@@ -11,6 +11,10 @@ It also shows how to integrate access to databases like mysql or postgres with s
 We are using React-Intl V2 as our translation framework. It seems to be the best and most thought after project out there at the moment.
 Even though it is still a pre-release it seems stable enough to be used already.
 
+Another nice feature is the use of CSS modules. It removes all the trouble that usually comes with naming conflicts.
+
+To make AJAX calls we use fetch, which is available natively on modern browsers and polyfilled via webpack for old browsers.
+
 And we will keep on adding other important SPA related components and processes for whitelabeling and everything else you need to kick-start your unicorn.
 
 # Simplified GraphQL
@@ -39,7 +43,9 @@ Add a changelog to make it easier for followers to find relevant changes.
 * React
 * Freezer
 * Simplified GraphQL
-* MySQL
+* CSS Modules
+* SASS
+* Sequelize MySQL/MSSQL/Postgres
 * Webpack
 * React Bootstrap
 * React-Intl V2 Internationalization
